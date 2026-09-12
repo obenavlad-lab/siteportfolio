@@ -66,6 +66,18 @@
     background:linear-gradient(to top, rgba(9,11,7,.88) 0%, rgba(9,11,7,.4) 42%, rgba(9,11,7,0) 72%);
   }
 
+  /* duplicate of the hero image, distorted with a real SVG filter,
+     revealed only through a clip-path matching the glass panel's bounds (set by JS) */
+  .hero-refraction{
+    position:absolute; inset:0;
+    background-image:url("hero-bg.jpg");
+    background-size:cover;
+    background-position:center;
+    filter:url(#glass-refraction) saturate(1.15) brightness(.96);
+    clip-path:inset(100% round 24px);
+    pointer-events:none;
+  }
+
   .nav{
     position:fixed; top:2.25rem; left:2.5rem; right:2.5rem;
     z-index:50;
@@ -99,8 +111,10 @@
 
   /* ---------- liquid glass panel ---------- */
   .glass-name{
+    --rx:0deg; --ry:0deg;
     position:relative;
     display:inline-block;
+    overflow:hidden;
     padding:clamp(1rem,3vw,2.1rem) clamp(1.15rem,3.5vw,2.6rem);
     border-radius:clamp(18px,2.6vw,32px);
     background:linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.02) 55%, rgba(255,255,255,.08));
@@ -113,12 +127,15 @@
       0 18px 44px rgba(0,0,0,.35),
       0 0 60px 6px rgba(119,131,95,.12);
     opacity:0;
-    transform:scale(.94);
+    transform:perspective(900px) scale(.94);
     animation:glassIn .8s cubic-bezier(.16,1,.3,1) forwards, breathe 6s ease-in-out 1.2s infinite;
     animation-delay:.25s, 1.2s;
   }
-  @keyframes glassIn{ to{ opacity:1; transform:scale(1); } }
-  @keyframes breathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.012); } }
+  @keyframes glassIn{ to{ opacity:1; transform:perspective(900px) scale(1) rotateX(var(--rx)) rotateY(var(--ry)); } }
+  @keyframes breathe{
+    0%,100%{ transform:perspective(900px) scale(1) rotateX(var(--rx)) rotateY(var(--ry)); }
+    50%{ transform:perspective(900px) scale(1.012) rotateX(var(--rx)) rotateY(var(--ry)); }
+  }
 
   .glass-sheen{
     position:absolute; inset:0; z-index:0;
@@ -133,6 +150,18 @@
     animation:sweep 5s ease-in-out 1.3s infinite;
   }
   @keyframes sweep{ 0%{ left:-60%; } 14%{ left:130%; } 100%{ left:130%; } }
+
+  /* cursor-follow light on the glass surface */
+  .glass-name::after{
+    content:'';
+    position:absolute; inset:0; z-index:2;
+    border-radius:inherit; pointer-events:none;
+    background:radial-gradient(220px circle at var(--mx,50%) var(--my,20%), rgba(255,255,255,.4), rgba(255,255,255,0) 62%);
+    mix-blend-mode:overlay;
+    opacity:0;
+    transition:opacity .5s ease;
+  }
+  .glass-name:hover::after{ opacity:1; }
 
   .name{
     position:relative; z-index:1;
@@ -255,6 +284,7 @@
     .glass-name{ opacity:1; transform:none; }
     .nav{ opacity:1; }
     .tagline, .scroll-cue{ opacity:1; transform:none; }
+    .hero-refraction{ display:none; }
   }
 </style>
 </head>
@@ -262,9 +292,18 @@
 
 <div class="grain" aria-hidden="true"></div>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="glass-refraction" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves="2" seed="7" result="noise"/>
+    <feGaussianBlur in="noise" stdDeviation="2.4" result="softNoise"/>
+    <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="55" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
 <header class="hero">
   <img class="hero-bg" src="hero-bg.jpg" alt="">
   <div class="hero-overlay"></div>
+  <div class="hero-refraction" aria-hidden="true"></div>
 
   <nav class="nav">
     <a href="#work">Index</a>
@@ -325,5 +364,63 @@
   </div>
 </footer>
 
+<script>
+  (function(){
+    var hero = document.querySelector('.hero');
+    var glass = document.querySelector('.glass-name');
+    var refraction = document.querySelector('.hero-refraction');
+    if(!hero || !glass || !refraction) return;
+
+    function syncRefractionClip(){
+      var heroRect = hero.getBoundingClientRect();
+      var panelRect = glass.getBoundingClientRect();
+      var radius = getComputedStyle(glass).borderRadius;
+      var top = Math.max(0, panelRect.top - heroRect.top);
+      var left = Math.max(0, panelRect.left - heroRect.left);
+      var right = Math.max(0, heroRect.right - panelRect.right);
+      var bottom = Math.max(0, heroRect.bottom - panelRect.bottom);
+      refraction.style.clipPath = 'inset(' + top + 'px ' + right + 'px ' + bottom + 'px ' + left + 'px round ' + radius + ')';
+    }
+
+    syncRefractionClip();
+    window.addEventListener('resize', syncRefractionClip);
+    window.addEventListener('load', syncRefractionClip);
+    if(document.fonts && document.fonts.ready){
+      document.fonts.ready.then(syncRefractionClip);
+    }
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduceMotion) return;
+
+    glass.addEventListener('pointermove', function(e){
+      var r = glass.getBoundingClientRect();
+      var mx = ((e.clientX - r.left) / r.width) * 100;
+      var my = ((e.clientY - r.top) / r.height) * 100;
+      glass.style.setProperty('--mx', mx + '%');
+      glass.style.setProperty('--my', my + '%');
+
+      var px = (e.clientX - r.left) / r.width - 0.5;   // -0.5..0.5
+      var py = (e.clientY - r.top) / r.height - 0.5;   // -0.5..0.5
+      var MAX_TILT = 8; // degrees
+      tiltTarget.ry = px * MAX_TILT * 2;
+      tiltTarget.rx = -py * MAX_TILT * 2;
+    });
+    glass.addEventListener('pointerleave', function(){
+      tiltTarget.rx = 0;
+      tiltTarget.ry = 0;
+    });
+
+    var tiltTarget = { rx:0, ry:0 };
+    var tiltCurrent = { rx:0, ry:0 };
+    function tickTilt(){
+      tiltCurrent.rx += (tiltTarget.rx - tiltCurrent.rx) * 0.12;
+      tiltCurrent.ry += (tiltTarget.ry - tiltCurrent.ry) * 0.12;
+      glass.style.setProperty('--rx', tiltCurrent.rx.toFixed(2) + 'deg');
+      glass.style.setProperty('--ry', tiltCurrent.ry.toFixed(2) + 'deg');
+      requestAnimationFrame(tickTilt);
+    }
+    requestAnimationFrame(tickTilt);
+  })();
+</script>
 </body>
 </html>
