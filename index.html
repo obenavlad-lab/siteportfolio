@@ -109,13 +109,12 @@
     transform:translateY(-1px);
   }
 
-  .hero-content{ position:relative; z-index:2; padding:0 2.5rem 3rem; }
+  .hero-content{ position:relative; z-index:2; padding:0 2.5rem 3rem; perspective:900px; }
 
   .glass-name{
     position:relative;
     display:inline-block;
     overflow:hidden;
-    perspective:900px;
     padding:clamp(1rem,3vw,2.1rem) clamp(1.15rem,3.5vw,2.6rem);
     border-radius:clamp(18px,2.6vw,32px);
     background:linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.02) 55%, rgba(255,255,255,.08));
@@ -137,7 +136,10 @@
 
   .glass-tilt{
     position:relative;
+    display:inline-block;
     transform-style:preserve-3d;
+    transform-origin:center;
+    will-change:transform;
   }
 
   .glass-sheen{
@@ -359,8 +361,8 @@
   </nav>
 
   <div class="hero-content">
-    <div class="glass-name">
-      <div class="glass-tilt">
+    <div class="glass-tilt">
+      <div class="glass-name">
         <div class="glass-sheen" aria-hidden="true"></div>
         <h1 class="name">
           <span class="line">DANYLO</span>
@@ -459,13 +461,12 @@
     if(!glass || !tilt) return;
 
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var supportsPreciseHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    if(reduceMotion || !supportsPreciseHover) return;
+    if(reduceMotion) return;
 
     var tiltTarget = { rx:0, ry:0 };
     var tiltCurrent = { rx:0, ry:0 };
 
-    glass.addEventListener('pointermove', function(e){
+    glass.addEventListener('mousemove', function(e){
       var r = glass.getBoundingClientRect();
       var mx = ((e.clientX - r.left) / r.width) * 100;
       var my = ((e.clientY - r.top) / r.height) * 100;
@@ -474,11 +475,11 @@
 
       var px = (e.clientX - r.left) / r.width - 0.5;
       var py = (e.clientY - r.top) / r.height - 0.5;
-      var MAX_TILT = 8;
+      var MAX_TILT = 10;
       tiltTarget.ry = px * MAX_TILT * 2;
       tiltTarget.rx = -py * MAX_TILT * 2;
     });
-    glass.addEventListener('pointerleave', function(){
+    glass.addEventListener('mouseleave', function(){
       tiltTarget.rx = 0;
       tiltTarget.ry = 0;
     });
