@@ -111,10 +111,10 @@
 
   /* ---------- liquid glass panel ---------- */
   .glass-name{
-    --rx:0deg; --ry:0deg;
     position:relative;
     display:inline-block;
     overflow:hidden;
+    perspective:900px;
     padding:clamp(1rem,3vw,2.1rem) clamp(1.15rem,3.5vw,2.6rem);
     border-radius:clamp(18px,2.6vw,32px);
     background:linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.02) 55%, rgba(255,255,255,.08));
@@ -127,14 +127,19 @@
       0 18px 44px rgba(0,0,0,.35),
       0 0 60px 6px rgba(119,131,95,.12);
     opacity:0;
-    transform:perspective(900px) scale(.94);
+    transform:scale(.94);
     animation:glassIn .8s cubic-bezier(.16,1,.3,1) forwards, breathe 6s ease-in-out 1.2s infinite;
     animation-delay:.25s, 1.2s;
   }
-  @keyframes glassIn{ to{ opacity:1; transform:perspective(900px) scale(1) rotateX(var(--rx)) rotateY(var(--ry)); } }
-  @keyframes breathe{
-    0%,100%{ transform:perspective(900px) scale(1) rotateX(var(--rx)) rotateY(var(--ry)); }
-    50%{ transform:perspective(900px) scale(1.012) rotateX(var(--rx)) rotateY(var(--ry)); }
+  @keyframes glassIn{ to{ opacity:1; transform:scale(1); } }
+  @keyframes breathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.012); } }
+
+  /* tilt lives on its own element with a plain inline transform set by JS —
+     a value referenced by a running CSS animation (like breathe above) does not
+     get re-substituted every frame, so rotation can't share that property */
+  .glass-tilt{
+    position:relative;
+    transform-style:preserve-3d;
   }
 
   .glass-sheen{
@@ -232,21 +237,69 @@
 
   /* ---------- work ---------- */
   .work{ background:var(--charcoal); color:var(--fog); padding:6rem 2.5rem 6.5rem; }
-  .work-row{
-    display:flex; align-items:baseline; justify-content:space-between; gap:1.25rem;
-    padding:1.4rem 0; border-top:1px solid rgba(245,244,236,.14);
-    flex-wrap:wrap;
+
+  .work-toggle{
+    all:unset;
+    box-sizing:border-box;
+    display:flex; align-items:center; justify-content:space-between; gap:1.25rem;
+    width:100%; cursor:pointer;
+    padding:1.4rem 0;
+    border-top:1px solid rgba(245,244,236,.14);
+    border-bottom:1px solid rgba(245,244,236,.14);
   }
-  .work-row:last-child{ border-bottom:1px solid rgba(245,244,236,.14); }
-  .work-title{
+  .work-toggle span:first-child{
     font-family:'Anton', sans-serif; text-transform:uppercase;
     color:var(--white); font-size:clamp(1.25rem, 3vw, 2.05rem);
     letter-spacing:.005em; transition:letter-spacing .4s ease, color .4s ease;
   }
-  .work-row:hover .work-title{ letter-spacing:.025em; color:var(--fog); }
-  .work-meta{ display:flex; gap:1.75rem; align-items:baseline; }
-  .work-cat{ font-style:italic; font-size:1rem; opacity:.7; white-space:nowrap; }
-  .work-year{ font-variant-numeric:tabular-nums; font-size:.95rem; opacity:.5; min-width:3.2ch; text-align:right; }
+  .work-toggle:hover span:first-child{ letter-spacing:.025em; color:var(--fog); }
+  .work-toggle-icon{
+    font-family:'Cormorant Garamond', serif; font-weight:400;
+    font-size:1.8rem; line-height:1; color:var(--fog);
+    transition:transform .45s cubic-bezier(.16,1,.3,1);
+  }
+  .work-toggle[aria-expanded="true"] .work-toggle-icon{ transform:rotate(45deg); }
+
+  /* grid-template-rows 0fr->1fr gives a smooth height animation
+     without JS measuring pixel heights */
+  .work-panel{
+    display:grid;
+    grid-template-rows:0fr;
+    transition:grid-template-rows .55s cubic-bezier(.16,1,.3,1);
+  }
+  .work-toggle[aria-expanded="true"] + .work-panel{ grid-template-rows:1fr; }
+  .work-panel-inner{ overflow:hidden; }
+
+  .work-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:2rem;
+    padding-top:2.5rem;
+  }
+  .work-card{ display:flex; flex-direction:column; gap:.9rem; }
+  .work-card-art{
+    aspect-ratio:4/3;
+    border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Anton', sans-serif; font-size:2.6rem;
+    color:rgba(245,244,236,.85); letter-spacing:.02em;
+    transition:transform .4s cubic-bezier(.16,1,.3,1);
+    /* placeholder art — swap background for background-image: url(...) center/cover once real screenshots exist */
+  }
+  .work-card:hover .work-card-art{ transform:translateY(-4px); }
+  .work-card-art--1{ background:linear-gradient(135deg, #77835F, #2b3122); }
+  .work-card-art--2{ background:linear-gradient(135deg, #5c6b7a, #1c2228); }
+  .work-card-art--3{ background:linear-gradient(135deg, #8a7a5f, #2b2622); }
+  .work-card-art--4{ background:linear-gradient(135deg, #6f5f83, #241f2b); }
+  .work-card-title{
+    margin:0;
+    font-family:'Anton', sans-serif; text-transform:uppercase;
+    color:var(--white); font-size:1.15rem; font-weight:400;
+  }
+  .work-card-meta{
+    margin:0; display:flex; justify-content:space-between;
+    font-style:italic; font-size:.95rem; opacity:.65;
+  }
 
   /* ---------- footer ---------- */
   .contact{
@@ -267,7 +320,7 @@
     .about{ grid-template-columns:1fr; gap:2.25rem; padding:5rem 1.5rem; }
     .about-meta{ border-left:none; padding-left:0; flex-direction:row; flex-wrap:wrap; gap:1.5rem; }
     .work{ padding:4.5rem 1.5rem 5rem; }
-    .work-row{ flex-direction:column; align-items:flex-start; gap:.4rem; }
+    .work-grid{ grid-template-columns:1fr 1fr; gap:1.5rem; }
     .contact{ padding:2.5rem 1.5rem; }
     .nav, .hero-content{ padding-left:1.5rem; padding-right:1.5rem; }
     .nav{ left:1.5rem; right:1.5rem; }
@@ -282,6 +335,7 @@
     .hero{ opacity:1; }
     .hero-bg{ transform:none; }
     .glass-name{ opacity:1; transform:none; }
+    .glass-tilt{ transform:none !important; }
     .nav{ opacity:1; }
     .tagline, .scroll-cue{ opacity:1; transform:none; }
     .hero-refraction{ display:none; }
@@ -312,15 +366,18 @@
 
   <div class="hero-content">
     <div class="glass-name">
-      <div class="glass-sheen" aria-hidden="true"></div>
-      <h1 class="name">
-        <span class="line">DANYLO</span>
-        <span class="line">TURCHYN</span>
-      </h1>
+      <div class="glass-tilt">
+        <div class="glass-sheen" aria-hidden="true"></div>
+        <h1 class="name">
+          <span class="line">DANYLO</span>
+          <span class="line">TURCHYN</span>
+        </h1>
+      </div>
     </div>
     <p class="tagline">Interfaces and websites, built with quiet precision.</p>
   </div>
 
+  <a class="scroll-cue" href="#about" aria-label="Scroll to about section"><i></i></a>
 </header>
 
 <section class="about" id="about">
@@ -330,28 +387,43 @@
     considered detail over a quick fix.
   </p>
   <div class="about-meta">
-    <span>Based in Kyiv, Prague, Lisbon</span>
+    <span>Based in Kyiv</span>
     <span>UI &amp; Web Development</span>
     <span>Available for select projects</span>
   </div>
 </section>
 
 <section class="work" id="work">
-  <div class="work-row">
-    <span class="work-title">Aperture</span>
-    <span class="work-meta"><span class="work-cat">Web App</span><span class="work-year">2025</span></span>
-  </div>
-  <div class="work-row">
-    <span class="work-title">Glasswork</span>
-    <span class="work-meta"><span class="work-cat">Design System</span><span class="work-year">2024</span></span>
-  </div>
-  <div class="work-row">
-    <span class="work-title">Fieldnotes</span>
-    <span class="work-meta"><span class="work-cat">Portfolio Site</span><span class="work-year">2023</span></span>
-  </div>
-  <div class="work-row">
-    <span class="work-title">Northbound</span>
-    <span class="work-meta"><span class="work-cat">E-commerce UI</span><span class="work-year">2022</span></span>
+  <button class="work-toggle" type="button" aria-expanded="false" aria-controls="work-panel">
+    <span>View All Work</span>
+    <span class="work-toggle-icon" aria-hidden="true">+</span>
+  </button>
+
+  <div class="work-panel" id="work-panel">
+    <div class="work-panel-inner">
+      <div class="work-grid">
+        <article class="work-card">
+          <div class="work-card-art work-card-art--1" aria-hidden="true">A</div>
+          <h3 class="work-card-title">Aperture</h3>
+          <p class="work-card-meta"><span>Web App</span><span>2025</span></p>
+        </article>
+        <article class="work-card">
+          <div class="work-card-art work-card-art--2" aria-hidden="true">G</div>
+          <h3 class="work-card-title">Glasswork</h3>
+          <p class="work-card-meta"><span>Design System</span><span>2024</span></p>
+        </article>
+        <article class="work-card">
+          <div class="work-card-art work-card-art--3" aria-hidden="true">F</div>
+          <h3 class="work-card-title">Fieldnotes</h3>
+          <p class="work-card-meta"><span>Portfolio Site</span><span>2023</span></p>
+        </article>
+        <article class="work-card">
+          <div class="work-card-art work-card-art--4" aria-hidden="true">N</div>
+          <h3 class="work-card-title">Northbound</h3>
+          <p class="work-card-meta"><span>E-commerce UI</span><span>2022</span></p>
+        </article>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -388,9 +460,18 @@
     if(document.fonts && document.fonts.ready){
       document.fonts.ready.then(syncRefractionClip);
     }
+  })();
+
+  (function(){
+    var glass = document.querySelector('.glass-name');
+    var tilt = document.querySelector('.glass-tilt');
+    if(!glass || !tilt) return;
 
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(reduceMotion) return;
+
+    var tiltTarget = { rx:0, ry:0 };
+    var tiltCurrent = { rx:0, ry:0 };
 
     glass.addEventListener('pointermove', function(e){
       var r = glass.getBoundingClientRect();
@@ -410,16 +491,22 @@
       tiltTarget.ry = 0;
     });
 
-    var tiltTarget = { rx:0, ry:0 };
-    var tiltCurrent = { rx:0, ry:0 };
     function tickTilt(){
       tiltCurrent.rx += (tiltTarget.rx - tiltCurrent.rx) * 0.12;
       tiltCurrent.ry += (tiltTarget.ry - tiltCurrent.ry) * 0.12;
-      glass.style.setProperty('--rx', tiltCurrent.rx.toFixed(2) + 'deg');
-      glass.style.setProperty('--ry', tiltCurrent.ry.toFixed(2) + 'deg');
+      tilt.style.transform = 'rotateX(' + tiltCurrent.rx.toFixed(2) + 'deg) rotateY(' + tiltCurrent.ry.toFixed(2) + 'deg)';
       requestAnimationFrame(tickTilt);
     }
     requestAnimationFrame(tickTilt);
+  })();
+
+  (function(){
+    var toggle = document.querySelector('.work-toggle');
+    if(!toggle) return;
+    toggle.addEventListener('click', function(){
+      var expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+    });
   })();
 </script>
 </body>
