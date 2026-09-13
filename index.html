@@ -30,14 +30,12 @@
   a{ color:inherit; }
   a:focus-visible, button:focus-visible{ outline:2px solid var(--lichen); outline-offset:3px; }
 
-  /* ---------- film-grain overlay ---------- */
   .grain{
     position:fixed; inset:0; z-index:60; pointer-events:none;
     opacity:.05; mix-blend-mode:overlay;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* ---------- hero ---------- */
   .hero{
     position:relative;
     height:100svh;
@@ -66,8 +64,6 @@
     background:linear-gradient(to top, rgba(9,11,7,.88) 0%, rgba(9,11,7,.4) 42%, rgba(9,11,7,0) 72%);
   }
 
-  /* duplicate of the hero image, distorted with a real SVG filter,
-     revealed only through a clip-path matching the glass panel's bounds (set by JS) */
   .hero-refraction{
     position:absolute; inset:0;
     background-image:url("hero-bg.jpg");
@@ -109,7 +105,6 @@
 
   .hero-content{ position:relative; z-index:2; padding:0 2.5rem 3rem; }
 
-  /* ---------- liquid glass panel ---------- */
   .glass-name{
     position:relative;
     display:inline-block;
@@ -134,9 +129,6 @@
   @keyframes glassIn{ to{ opacity:1; transform:scale(1); } }
   @keyframes breathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.012); } }
 
-  /* tilt lives on its own element with a plain inline transform set by JS —
-     a value referenced by a running CSS animation (like breathe above) does not
-     get re-substituted every frame, so rotation can't share that property */
   .glass-tilt{
     position:relative;
     transform-style:preserve-3d;
@@ -156,7 +148,6 @@
   }
   @keyframes sweep{ 0%{ left:-60%; } 14%{ left:130%; } 100%{ left:130%; } }
 
-  /* cursor-follow light on the glass surface */
   .glass-name::after{
     content:'';
     position:absolute; inset:0; z-index:2;
@@ -214,7 +205,6 @@
   }
   @keyframes scrollLine{ 0%{ top:-100%; } 55%{ top:100%; } 100%{ top:100%; } }
 
-  /* ---------- about ---------- */
   .about{
     padding:7rem 2.5rem;
     display:grid;
@@ -235,7 +225,6 @@
     padding-left:1.5rem; align-self:start; padding-top:.35rem;
   }
 
-  /* ---------- work ---------- */
   .work{ background:var(--charcoal); color:var(--fog); padding:6rem 2.5rem 6.5rem; }
 
   .work-toggle{
@@ -260,8 +249,6 @@
   }
   .work-toggle[aria-expanded="true"] .work-toggle-icon{ transform:rotate(45deg); }
 
-  /* grid-template-rows 0fr->1fr gives a smooth height animation
-     without JS measuring pixel heights */
   .work-panel{
     display:grid;
     grid-template-rows:0fr;
@@ -303,7 +290,6 @@
     font-style:italic; font-size:.95rem; opacity:.65;
   }
 
-  /* ---------- footer ---------- */
   .contact{
     background:var(--ink); color:var(--bone);
     padding:3rem 2.5rem; display:flex; flex-wrap:wrap;
@@ -389,7 +375,7 @@
     considered detail over a quick fix.
   </p>
   <div class="about-meta">
-    <span>Based in Kyiv</span>
+    <span>Based in Kyiv, Prague, Lisbon</span>
     <span>UI &amp; Web Development</span>
     <span>Available for select projects</span>
   </div>
@@ -408,19 +394,19 @@
           <a class="work-card-link" href="https://lastbuild-1-git-main-waveguard.vercel.app/#hero" target="_blank" rel="noopener noreferrer" aria-label="Open Waveguard website"></a>
           <div class="work-card-art work-card-art--1" aria-hidden="true"></div>
           <h3 class="work-card-title">Waveguard</h3>
-          <p class="work-card-meta"><span>E-commerce</span><span>↗</span></p>
+          <p class="work-card-meta"><span>Millitary Site</span><span>↗</span></p>
         </article>
         <article class="work-card">
           <a class="work-card-link" href="https://autoservice.vasilkove.com.ua/projects" target="_blank" rel="noopener noreferrer" aria-label="Open Autoservice website"></a>
           <div class="work-card-art work-card-art--2" aria-hidden="true"></div>
           <h3 class="work-card-title">Autoservice</h3>
-          <p class="work-card-meta"><span>Business Site</span><span>↗</span></p>
+          <p class="work-card-meta"><span>Autoservice Site</span><span>↗</span></p>
         </article>
         <article class="work-card">
           <a class="work-card-link" href="https://onlinegym.pro" target="_blank" rel="noopener noreferrer" aria-label="Open Onlinegym website"></a>
           <div class="work-card-art work-card-art--3" aria-hidden="true"></div>
           <h3 class="work-card-title">Onlinegym</h3>
-          <p class="work-card-meta"><span>Fitness</span><span>↗</span></p>
+          <p class="work-card-meta"><span>Fitness Site</span><span>↗</span></p>
         </article>
       </div>
     </div>
@@ -430,9 +416,9 @@
 <footer class="contact" id="contact">
   <div class="footer-name">Danylo Turchyn</div>
   <div class="footer-links">
-    <a href="mailto:hello@danyloturchyn.com">hello@danyloturchyn.com</a>
+    <a href="mailto:hello@danyloturchyn.com">obenavlad@gmail.com</a>
     <a href="https://t.me/shadowbless" target="_blank" rel="noopener">Telegram</a>
-    <span>Kyiv, Ukraine</span>
+    <span>Kyiv, Prague, Lisbon</span>
   </div>
 </footer>
 
@@ -480,9 +466,9 @@
       glass.style.setProperty('--mx', mx + '%');
       glass.style.setProperty('--my', my + '%');
 
-      var px = (e.clientX - r.left) / r.width - 0.5;   // -0.5..0.5
-      var py = (e.clientY - r.top) / r.height - 0.5;   // -0.5..0.5
-      var MAX_TILT = 8; // degrees
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      var MAX_TILT = 8;
       tiltTarget.ry = px * MAX_TILT * 2;
       tiltTarget.rx = -py * MAX_TILT * 2;
     });
