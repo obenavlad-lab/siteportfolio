@@ -276,21 +276,23 @@
     gap:2rem;
     padding-top:2.5rem;
   }
-  .work-card{ display:flex; flex-direction:column; gap:.9rem; }
+  .work-card{ position:relative; display:flex; flex-direction:column; gap:.9rem; }
+  .work-card-link{
+    position:absolute; inset:0; z-index:2;
+    border-radius:14px;
+  }
   .work-card-art{
     aspect-ratio:4/3;
     border-radius:14px;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Anton', sans-serif; font-size:2.6rem;
-    color:rgba(245,244,236,.85); letter-spacing:.02em;
+    background-size:cover;
+    background-position:top center;
+    background-color:#1c1e19;
     transition:transform .4s cubic-bezier(.16,1,.3,1);
-    /* placeholder art — swap background for background-image: url(...) center/cover once real screenshots exist */
   }
   .work-card:hover .work-card-art{ transform:translateY(-4px); }
-  .work-card-art--1{ background:linear-gradient(135deg, #77835F, #2b3122); }
-  .work-card-art--2{ background:linear-gradient(135deg, #5c6b7a, #1c2228); }
-  .work-card-art--3{ background:linear-gradient(135deg, #8a7a5f, #2b2622); }
-  .work-card-art--4{ background:linear-gradient(135deg, #6f5f83, #241f2b); }
+  .work-card-art--1{ background-image:url("work-waveguard.jpg"); }
+  .work-card-art--2{ background-image:url("work-autoservice.jpg"); }
+  .work-card-art--3{ background-image:url("work-onlinegym.jpg"); }
   .work-card-title{
     margin:0;
     font-family:'Anton', sans-serif; text-transform:uppercase;
@@ -377,6 +379,7 @@
     <p class="tagline">Interfaces and websites, built with quiet precision.</p>
   </div>
 
+  <a class="scroll-cue" href="#about" aria-label="Scroll to about section"><i></i></a>
 </header>
 
 <section class="about" id="about">
@@ -386,7 +389,7 @@
     considered detail over a quick fix.
   </p>
   <div class="about-meta">
-    <span>Based in Kyiv, Prague, Lisbon</span>
+    <span>Based in Kyiv</span>
     <span>UI &amp; Web Development</span>
     <span>Available for select projects</span>
   </div>
@@ -402,24 +405,22 @@
     <div class="work-panel-inner">
       <div class="work-grid">
         <article class="work-card">
-          <div class="work-card-art work-card-art--1" aria-hidden="true">A</div>
-          <h3 class="work-card-title">Aperture</h3>
-          <p class="work-card-meta"><span>Web App</span><span>2025</span></p>
+          <a class="work-card-link" href="https://lastbuild-1-git-main-waveguard.vercel.app/#hero" target="_blank" rel="noopener noreferrer" aria-label="Open Waveguard website"></a>
+          <div class="work-card-art work-card-art--1" aria-hidden="true"></div>
+          <h3 class="work-card-title">Waveguard</h3>
+          <p class="work-card-meta"><span>E-commerce</span><span>↗</span></p>
         </article>
         <article class="work-card">
-          <div class="work-card-art work-card-art--2" aria-hidden="true">G</div>
-          <h3 class="work-card-title">Glasswork</h3>
-          <p class="work-card-meta"><span>Design System</span><span>2024</span></p>
+          <a class="work-card-link" href="https://autoservice.vasilkove.com.ua/projects" target="_blank" rel="noopener noreferrer" aria-label="Open Autoservice website"></a>
+          <div class="work-card-art work-card-art--2" aria-hidden="true"></div>
+          <h3 class="work-card-title">Autoservice</h3>
+          <p class="work-card-meta"><span>Business Site</span><span>↗</span></p>
         </article>
         <article class="work-card">
-          <div class="work-card-art work-card-art--3" aria-hidden="true">F</div>
-          <h3 class="work-card-title">Fieldnotes</h3>
-          <p class="work-card-meta"><span>Portfolio Site</span><span>2023</span></p>
-        </article>
-        <article class="work-card">
-          <div class="work-card-art work-card-art--4" aria-hidden="true">N</div>
-          <h3 class="work-card-title">Northbound</h3>
-          <p class="work-card-meta"><span>E-commerce UI</span><span>2022</span></p>
+          <a class="work-card-link" href="https://onlinegym.pro" target="_blank" rel="noopener noreferrer" aria-label="Open Onlinegym website"></a>
+          <div class="work-card-art work-card-art--3" aria-hidden="true"></div>
+          <h3 class="work-card-title">Onlinegym</h3>
+          <p class="work-card-meta"><span>Fitness</span><span>↗</span></p>
         </article>
       </div>
     </div>
