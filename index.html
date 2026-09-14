@@ -341,7 +341,6 @@
     .hero{ opacity:1; }
     .hero-bg{ transform:none; }
     .glass-name{ opacity:1; transform:none; }
-    .glass-tilt{ transform:none !important; }
     .nav{ opacity:1; }
     .tagline{ opacity:1; transform:none; }
     .hero-refraction{ display:none; }
@@ -471,9 +470,6 @@
     var glass = document.querySelector('.glass-name');
     var tilt = document.querySelector('.glass-tilt');
     if(!glass || !tilt) return;
-
-    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(reduceMotion) return;
 
     var tiltTarget = { rx:0, ry:0 };
     var tiltCurrent = { rx:0, ry:0 };
