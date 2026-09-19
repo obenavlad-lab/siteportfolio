@@ -291,13 +291,77 @@
   .work-toggle[aria-expanded="true"] + .work-panel{ grid-template-rows:1fr; }
   .work-panel-inner{ overflow:hidden; }
 
-  .work-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
-    gap:2rem;
-    padding-top:2.5rem;
+  .work-carousel{ position:relative; }
+
+  .work-carousel::before,
+  .work-carousel::after{
+    content:'';
+    position:absolute; top:0; bottom:0;
+    width:clamp(28px, 7vw, 84px);
+    z-index:3; pointer-events:none;
+    transition:opacity .35s ease;
   }
-  .work-card{ position:relative; display:flex; flex-direction:column; gap:.9rem; }
+  .work-carousel::before{
+    left:0; opacity:0;
+    background:linear-gradient(to right, var(--charcoal), rgba(28,30,25,0));
+  }
+  .work-carousel::after{
+    right:0; opacity:1;
+    background:linear-gradient(to left, var(--charcoal), rgba(28,30,25,0));
+  }
+  .work-carousel[data-at-start="true"]::before{ opacity:0; }
+  .work-carousel[data-at-start="false"]::before{ opacity:1; }
+  .work-carousel[data-at-end="true"]::after{ opacity:0; }
+  .work-carousel[data-at-end="false"]::after{ opacity:1; }
+  .work-carousel[data-scrollable="false"]::before,
+  .work-carousel[data-scrollable="false"]::after{ opacity:0; }
+
+  .work-arrow{
+    all:unset;
+    position:absolute; top:50%; transform:translateY(-50%);
+    z-index:5; width:3.1rem; height:3.1rem;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%; cursor:pointer; color:var(--white);
+    background:linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+    -webkit-backdrop-filter:blur(16px) saturate(160%);
+    backdrop-filter:blur(16px) saturate(160%);
+    border:1px solid rgba(255,255,255,.3);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.32),
+      inset 0 -10px 16px -12px rgba(255,255,255,.16),
+      0 12px 26px rgba(0,0,0,.4);
+    transition:background .35s ease, border-color .35s ease, opacity .35s ease, transform .35s cubic-bezier(.16,1,.3,1);
+  }
+  .work-arrow:hover{
+    background:linear-gradient(135deg, rgba(255,255,255,.28), rgba(255,255,255,.08));
+    border-color:rgba(255,255,255,.46);
+  }
+  .work-arrow:active{ transform:translateY(-50%) scale(.92); }
+  .work-arrow svg{ width:1.2rem; height:1.2rem; }
+  .work-arrow--prev{ left:.85rem; }
+  .work-arrow--next{ right:.85rem; }
+  .work-carousel[data-at-start="true"] .work-arrow--prev,
+  .work-carousel[data-at-end="true"] .work-arrow--next,
+  .work-carousel[data-scrollable="false"] .work-arrow{
+    opacity:0; pointer-events:none; transform:translateY(-50%) scale(.82);
+  }
+
+  .work-grid{
+    display:flex;
+    gap:1.75rem;
+    overflow-x:auto;
+    scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:2.5rem .25rem 1rem;
+    margin:0 -.25rem;
+  }
+  .work-grid::-webkit-scrollbar{ display:none; }
+  .work-card{
+    position:relative; display:flex; flex-direction:column; gap:.9rem;
+    flex:0 0 clamp(215px, 25vw, 280px);
+    scroll-snap-align:start;
+  }
   .work-card-link{
     position:absolute; inset:0; z-index:2;
     border-radius:14px;
@@ -347,7 +411,11 @@
     .about{ grid-template-columns:1fr; gap:2.25rem; padding:5rem 1.5rem; }
     .about-meta{ border-left:none; padding-left:0; flex-direction:row; flex-wrap:wrap; gap:1.5rem; }
     .work{ padding:4.5rem 1.5rem 5rem; }
-    .work-grid{ grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .work-grid{ gap:1.25rem; padding:2rem .25rem 1rem; }
+    .work-card{ flex-basis:68vw; }
+    .work-arrow{ width:2.6rem; height:2.6rem; }
+    .work-arrow--prev{ left:.4rem; }
+    .work-arrow--next{ right:.4rem; }
     .contact{ padding:2.5rem 1.5rem; }
     .nav, .hero-content{ padding-left:1.5rem; padding-right:1.5rem; }
     .nav{ left:1.5rem; right:1.5rem; justify-content:center; flex-wrap:wrap; row-gap:.6rem; }
@@ -359,7 +427,7 @@
   @media (max-width:520px){
     .hero-content{ padding-bottom:max(2rem, env(safe-area-inset-bottom)); }
     .nav{ top:max(.75rem, env(safe-area-inset-top)); }
-    .work-grid{ grid-template-columns:1fr; gap:2rem; }
+    .work-card{ flex-basis:80vw; }
     .work-card-art{ aspect-ratio:16/10; }
     .contact{ align-items:flex-start; flex-direction:column; }
   }
@@ -456,57 +524,64 @@
 
   <div class="work-panel" id="work-panel">
     <div class="work-panel-inner">
-      <div class="work-grid">
-        <article class="work-card">
-          <a class="work-card-link" href="https://lastbuild-1-git-main-waveguard.vercel.app/#hero" target="_blank" rel="noopener noreferrer" aria-label="Open Waveguard website"></a>
-          <div class="work-card-art work-card-art--1" aria-hidden="true"></div>
-          <h3 class="work-card-title">Waveguard</h3>
-          <p class="work-card-meta"><span>E-commerce</span><span>↗</span></p>
-        </article>
-        <article class="work-card">
-          <a class="work-card-link" href="https://obenavlad-lab.github.io/Forma/#home" target="_blank" rel="noopener noreferrer" aria-label="Open Autoservice website"></a>
-          <div class="work-card-art work-card-art--2" aria-hidden="true"></div>
-          <h3 class="work-card-title">FORMA</h3>
-          <p class="work-card-meta"><span>Business Site</span><span>↗</span></p>
-        </article>
-        <article class="work-card">
-          <a class="work-card-link" href="https://obenavlad-lab.github.io/-/#services" target="_blank" rel="noopener noreferrer" aria-label="Open Service Website"></a>
-          <div class="work-card-art work-card-art--3" aria-hidden="true"></div>
-          <h3 class="work-card-title">TechnoAuto</h3>
-          <p class="work-card-meta"><span>Service Website</span><span>↗</span></p>
-        </article>
+      <div class="work-carousel" data-at-start="true" data-at-end="false" data-scrollable="true">
+        <div class="work-grid" id="workGrid">
           <article class="work-card">
-          <a class="work-card-link" href="https://obenavlad-lab.github.io/Tiho/#main" target="_blank" rel="noopener noreferrer" aria-label="Open Furniture Store"></a>
-          <div class="work-card-art work-card-art--4" aria-hidden="true"></div>
-          <h3 class="work-card-title">Interia</h3>
-          <p class="work-card-meta"><span>Furniture Store</span><span>↗</span></p>
-        </article>
-              </article>
+            <a class="work-card-link" href="https://lastbuild-1-git-main-waveguard.vercel.app/#hero" target="_blank" rel="noopener noreferrer" aria-label="Open Waveguard website"></a>
+            <div class="work-card-art work-card-art--1" aria-hidden="true"></div>
+            <h3 class="work-card-title">Waveguard</h3>
+            <p class="work-card-meta"><span>E-commerce</span><span>↗</span></p>
+          </article>
           <article class="work-card">
-          <a class="work-card-link" href="https://obenavlad-lab.github.io/Tisha/" target="_blank" rel="noopener noreferrer" aria-label="Open Massage Saloon"></a>
-          <div class="work-card-art work-card-art--5" aria-hidden="true"></div>
-          <h3 class="work-card-title">Tisha</h3>
-          <p class="work-card-meta"><span>Massage Saloon</span><span>↗</span></p>
-        </article>
-             <article class="work-card">
-          <a class="work-card-link" href="https://obenavlad-lab.github.io/Velvet/" target="_blank" rel="noopener noreferrer" aria-label="Open Beauty Saloon"></a>
-          <div class="work-card-art work-card-art--6" aria-hidden="true"></div>
-          <h3 class="work-card-title">Velvet Beauty</h3>
-          <p class="work-card-meta"><span>Beauty Saloon</span><span>↗</span></p>
-        </article>
-        <article class="work-card">
-          <a class="work-card-link" href="https://obenavlad-lab.github.io/Flower/" target="_blank" rel="noopener noreferrer" aria-label="Open Beauty Saloon"></a>
-          <div class="work-card-art work-card-art--7" aria-hidden="true"></div>
-          <h3 class="work-card-title">Anna.</h3>
-          <p class="work-card-meta"><span>Flower Shop</span><span>↗</span></p>
-        </article>
+            <a class="work-card-link" href="https://obenavlad-lab.github.io/Forma/#home" target="_blank" rel="noopener noreferrer" aria-label="Open Autoservice website"></a>
+            <div class="work-card-art work-card-art--2" aria-hidden="true"></div>
+            <h3 class="work-card-title">FORMA</h3>
+            <p class="work-card-meta"><span>Business Site</span><span>↗</span></p>
+          </article>
           <article class="work-card">
-          <a class="work-card-link" href="https://obenavlad-lab.github.io/Zerno/" target="_blank" rel="noopener noreferrer" aria-label="Open Beauty Saloon"></a>
-          <div class="work-card-art work-card-art--8" aria-hidden="true"></div>
-          <h3 class="work-card-title">Zerno</h3>
-          <p class="work-card-meta"><span>Cofee Store</span><span>↗</span></p>
-        </article>
-        </article>
+            <a class="work-card-link" href="https://obenavlad-lab.github.io/-/#services" target="_blank" rel="noopener noreferrer" aria-label="Open Service Website"></a>
+            <div class="work-card-art work-card-art--3" aria-hidden="true"></div>
+            <h3 class="work-card-title">TechnoAuto</h3>
+            <p class="work-card-meta"><span>Service Website</span><span>↗</span></p>
+          </article>
+          <article class="work-card">
+            <a class="work-card-link" href="https://obenavlad-lab.github.io/Tiho/#main" target="_blank" rel="noopener noreferrer" aria-label="Open Furniture Store"></a>
+            <div class="work-card-art work-card-art--4" aria-hidden="true"></div>
+            <h3 class="work-card-title">Interia</h3>
+            <p class="work-card-meta"><span>Furniture Store</span><span>↗</span></p>
+          </article>
+          <article class="work-card">
+            <a class="work-card-link" href="https://obenavlad-lab.github.io/Tisha/" target="_blank" rel="noopener noreferrer" aria-label="Open Massage Saloon"></a>
+            <div class="work-card-art work-card-art--5" aria-hidden="true"></div>
+            <h3 class="work-card-title">Tisha</h3>
+            <p class="work-card-meta"><span>Massage Saloon</span><span>↗</span></p>
+          </article>
+          <article class="work-card">
+            <a class="work-card-link" href="https://obenavlad-lab.github.io/Velvet/" target="_blank" rel="noopener noreferrer" aria-label="Open Beauty Saloon"></a>
+            <div class="work-card-art work-card-art--6" aria-hidden="true"></div>
+            <h3 class="work-card-title">Velvet Beauty</h3>
+            <p class="work-card-meta"><span>Beauty Saloon</span><span>↗</span></p>
+          </article>
+          <article class="work-card">
+            <a class="work-card-link" href="https://obenavlad-lab.github.io/Flower/" target="_blank" rel="noopener noreferrer" aria-label="Open Beauty Saloon"></a>
+            <div class="work-card-art work-card-art--7" aria-hidden="true"></div>
+            <h3 class="work-card-title">Anna.</h3>
+            <p class="work-card-meta"><span>Flower Shop</span><span>↗</span></p>
+          </article>
+          <article class="work-card">
+            <a class="work-card-link" href="https://obenavlad-lab.github.io/Zerno/" target="_blank" rel="noopener noreferrer" aria-label="Open Beauty Saloon"></a>
+            <div class="work-card-art work-card-art--8" aria-hidden="true"></div>
+            <h3 class="work-card-title">Zerno</h3>
+            <p class="work-card-meta"><span>Cofee Store</span><span>↗</span></p>
+          </article>
+        </div>
+
+        <button class="work-arrow work-arrow--prev" type="button" aria-label="Previous work">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="work-arrow work-arrow--next" type="button" aria-label="Next work">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -584,11 +659,66 @@
 
   (function(){
     var toggle = document.querySelector('.work-toggle');
-    if(!toggle) return;
-    toggle.addEventListener('click', function(){
-      var expanded = toggle.getAttribute('aria-expanded') === 'true';
-      toggle.setAttribute('aria-expanded', String(!expanded));
-    });
+    var carousel = document.querySelector('.work-carousel');
+    var track = document.getElementById('workGrid');
+    var prevBtn = carousel ? carousel.querySelector('.work-arrow--prev') : null;
+    var nextBtn = carousel ? carousel.querySelector('.work-arrow--next') : null;
+
+    function updateEdges(){
+      if(!carousel || !track) return;
+      var max = track.scrollWidth - track.clientWidth;
+      var scrollable = max > 4;
+      carousel.setAttribute('data-scrollable', scrollable ? 'true' : 'false');
+      if(!scrollable){
+        carousel.setAttribute('data-at-start', 'true');
+        carousel.setAttribute('data-at-end', 'true');
+        return;
+      }
+      carousel.setAttribute('data-at-start', track.scrollLeft <= 4 ? 'true' : 'false');
+      carousel.setAttribute('data-at-end', track.scrollLeft >= max - 4 ? 'true' : 'false');
+    }
+
+    function cardStep(){
+      var card = track.querySelector('.work-card');
+      if(!card) return track.clientWidth * 0.85;
+      var style = getComputedStyle(track);
+      var gap = parseFloat(style.columnGap || style.gap) || 0;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    if(prevBtn){
+      prevBtn.addEventListener('click', function(){
+        track.scrollBy({ left: -cardStep(), behavior:'smooth' });
+      });
+    }
+    if(nextBtn){
+      nextBtn.addEventListener('click', function(){
+        track.scrollBy({ left: cardStep(), behavior:'smooth' });
+      });
+    }
+
+    if(track){
+      track.addEventListener('scroll', updateEdges, { passive:true });
+      track.addEventListener('wheel', function(e){
+        if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+          track.scrollLeft += e.deltaY;
+          e.preventDefault();
+        }
+      }, { passive:false });
+      window.addEventListener('resize', updateEdges);
+      updateEdges();
+    }
+
+    if(toggle){
+      toggle.addEventListener('click', function(){
+        var expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        if(!expanded){
+          setTimeout(updateEdges, 80);
+          setTimeout(updateEdges, 600);
+        }
+      });
+    }
   })();
 
   (function(){
