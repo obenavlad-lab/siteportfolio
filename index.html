@@ -473,7 +473,7 @@
   <nav class="nav">
     <a href="#about">About</a>
     <a href="#work">Work</a>
-    <a href="#contact">Contact</a>
+    <a href="https://t.me/shadowbless" target="_blank" rel="noopener noreferrer" aria-label="Open Telegram chat with Danylo">Contact</a>
   </nav>
 
   <div class="hero-content">
@@ -645,6 +645,7 @@
 
   (function(){
     var toggle = document.querySelector('.work-toggle');
+    var workLink = document.querySelector('a[href="#work"]');
     var carousel = document.querySelector('.work-carousel');
     var track = document.getElementById('workGrid');
     var prevBtn = carousel ? carousel.querySelector('.work-arrow--prev') : null;
@@ -702,6 +703,14 @@
         if(!expanded){
           setTimeout(updateEdges, 80);
           setTimeout(updateEdges, 600);
+        }
+      });
+    }
+
+    if(workLink && toggle){
+      workLink.addEventListener('click', function(){
+        if(toggle.getAttribute('aria-expanded') !== 'true'){
+          toggle.click();
         }
       });
     }
